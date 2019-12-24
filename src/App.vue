@@ -1,28 +1,67 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app" :style="style">
+   <!-- <img src="./assets/logo.png"> -->
+    <router-view />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
-  name: 'app',
-  components: {
-    HelloWorld
+  name: 'App',
+  data(){
+    return{
+      ratioHeigt:null,
+      ratioWidth:null
+    }
+  },
+  computed:{
+    style(){
+      return {
+        transform: "scale("+ this.ratioWidth + ',' + this.ratioHeigt + ") ",
+        transformOrigin: "left top ",
+        backgroundSize: "100%" + ' 100%',
+      }
+    }
+  },
+  created(){
+    window.addEventListener('resize',this.getHeight)
+    this.getHeight()
+  },
+  methods:{
+    getHeight(){
+      this.ratioWidth = window.innerWidth/1920
+      this.ratioHeigt=window.innerHeight/1080
+    }
   }
 }
 </script>
 
 <style>
+body{
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+}
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  width: 1920px;
+  height: 1080px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: #F1F1F2;
+  font-size: 14px;
+  font-family:Microsoft YaHei UI;
+  -webkit-transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
 }
+.l{ float: left;}
+.r{ float: right;}
+.height-100{
+  height: 100%;
+}
+
+
+
 </style>
