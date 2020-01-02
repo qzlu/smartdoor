@@ -8,12 +8,18 @@
                </el-button>
            </li>
            <slot name='operation-left'></slot>
-            <li class="l" v-if="exportData"><el-button :disabled="disabledExport"  @click="exportFile"><i class="iconfont icon-Export"></i>导出</el-button></li>
+            <!-- <li class="l" v-if="exportData"><el-button :disabled="disabledExport"  @click="exportFile"><i class="iconfont icon-Export"></i>导出</el-button></li> -->
             <!-- <li class="l"><el-button @click="queryData"><i class="iconfont icon-Refresh"></i>刷新</el-button></li> -->
             <li class="r">
                 <el-button class="primary" @click="queryData">
                    查询
                 </el-button>
+            </li>
+            <li v-if="showProjectList" class="r" style="position:absolute;top:-90px;right:0px;">
+                <span class="label">选择项目</span>
+                <el-select v-model="projectId" value-key="ProjectID" @change="selectProject">
+                    <el-option v-for="item in projectList" :key="item.ProjectID" :value="item.ProjectID" :label="item.ProjectName"></el-option>
+                </el-select>
             </li>
             <slot name='operation'></slot>
        </ul>
@@ -98,13 +104,8 @@ export default {
             filterText:'',
             tableData:[],
             pageIndex:1,
-            name:"xiaoming"
-
-        }
-    },
-    inject:{
-        buttonList:{
-            default:[]
+            projectList:[],
+            projectId:null
         }
     },
     props:{
@@ -116,7 +117,6 @@ export default {
             require:true,
             type:Function
         },
-        /* buttonList:Array, */
         'disabled-add':Boolean,
         filter:{ //是否显示搜索框
             default:true,
@@ -138,6 +138,10 @@ export default {
             default:true
         },
         showEdit:{
+            type:Boolean,
+            default:true
+        },
+        showProjectList:{
             type:Boolean,
             default:true
         }
@@ -165,7 +169,11 @@ export default {
         }
     },
     created(){
-        this.queryData()
+        if(this.showProjectList){
+            this.queryUserProject()
+        }else{
+            this.queryData()
+        }
     },
     methods:{
         firstPage(){
@@ -195,7 +203,12 @@ export default {
          * 查询表格数据
          */
         queryData(){
-            let getData = this.getData(this)
+            let param = {
+                PageIndex:this.pageIndex,
+                PageSize:10,
+                ProjectID:this.projectId
+            }
+            let getData = this.getData(param)
             if(!getData){
                 return
             }
@@ -216,6 +229,25 @@ export default {
         },
         handleCurrentChange(val){
             this.pageIndex = val
+            this.queryData()
+        },
+        /**
+         * 查询用户项目列表
+         */
+        queryUserProject(){
+            this.$post('/Project/QueryUserProject')
+            .then((result) => {
+                this.projectList = result.FObject || []
+                let project = this.projectList[0]
+                if(project){
+                    this.projectId = project.ProjectID
+                    this.queryData()
+                }
+            }).catch((err) => {
+                
+            });
+        },
+        selectProject(){
             this.queryData()
         },
         /**

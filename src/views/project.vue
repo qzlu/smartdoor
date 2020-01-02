@@ -4,6 +4,7 @@
           ref="table"
           :tableLabel="tableLabel"
           :getData="queryData"
+          :showProjectList="false"
           @beforeAdd = 'beforeAdd'
           @editItem = 'editItem'
           :deleteRow = 'deleteItem' 
@@ -95,7 +96,6 @@ export default {
             })
             this.$post('/Project/AddOrUpdateTProject',{TProject:{...this.addData}})
             .then((result) => {
-                console.log(result)
                 this.$message({
                     type:'success',
                     message:'操作成功'

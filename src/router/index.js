@@ -22,6 +22,10 @@ const routes = [
         }
       },
       {
+        path:'/test',
+        component: () =>import('@/components/HelloWorld.vue')
+      },
+      {
         path:'/doorInfo',
         component:() => import('@/views/doorInfo.vue'),
         meta:{

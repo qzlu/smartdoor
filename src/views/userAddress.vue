@@ -29,6 +29,7 @@
               ref="table"
               :tableLabel="tableLabel"
               :getData="queryData"
+              :showProjectList="false"
               @beforeAdd = 'beforeAdd'
               @editItem = 'editItem'
               :deleteRow = 'deleteItem' 
@@ -41,10 +42,6 @@
                     <el-option v-for="item in projectList" :key="item.ProjectID" :value="item" :label="item.ProjectName"></el-option>
                 </el-select>
             </li>
-<!--                 <li slot="operation" class="r">
-                    <span class="label">项目名称</span>
-                    <el-input></el-input>
-                </li> -->
                 <el-form slot="dialog" :model="addData"  ref="form">
                         <el-form-item label="节点名称"  prop="FAddressName" :rules="[{ required: true, message: '请输入'}]">
                             <el-input  v-model="addData.FAddressName"></el-input>
@@ -55,11 +52,8 @@
                                 <el-option :value="2" label="否"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="户址">
-                           <el-input  v-model="addData.FAddressDetail"></el-input>
-                        </el-form-item>
                         <el-form-item label="关联设备">
-                            <el-select v-model="addData.FAccessGUID">
+                            <el-select v-model="addData.FAccessGUID" clearable>
                                 <el-option v-for="item in deviceList" :key="item.FGUID" :value="item.FGUID" :label="item.AccessName"></el-option>
                             </el-select>
                         </el-form-item>
@@ -88,10 +82,10 @@ export default {
                     formatter:row => row.FAddressType == 1?'是':'否',
                     width:120
                 },
-                {
+/*                 {
                     prop:'FAddressDetail',
                     label:'户址'
-                },
+                }, */
                 {
                     prop: 'AccessName',
                     label: '关联设备',
@@ -125,12 +119,11 @@ export default {
     methods:{
         /**
          * 查询数据
-         * @param {Vue Component} that 传入子组件
+         * @param {Object} data 传入参数
          */
-        queryData(that){
+        queryData(data){
             let param = {
-                PageIndex:that.pageIndex,
-                PageSize:10,
+                ...data,
                 ProjectID:this.project?this.project.ProjectID:0,
                 FGUID:this.activeNode.FGUID||''
             }
@@ -164,7 +157,6 @@ export default {
         queryProjectTAccess(){
             this.$post('/Access/QueryProjectTAccess',{ProjectID:this.project.ProjectID})
             .then((result) => {
-                console.log(result)
                 this.deviceList = result.FObject || []
             }).catch((err) => {
                 
@@ -214,7 +206,6 @@ export default {
             })
             this.$post('/AddressNode/AddOrUpdateTAddressNode',{TAddressNode:{...this.addData},ProjectID:this.project.ProjectID})
             .then((result) => {
-                console.log(result)
                 this.$message({
                     type:'success',
                     message:'操作成功'

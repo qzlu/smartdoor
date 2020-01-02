@@ -6,24 +6,29 @@
           :showOperation="false"
           :tableLabel="tableLabel"
           :getData="queryData"
-          @beforeAdd = 'beforeAdd'
-          @editItem = 'editItem'
-          :deleteRow = 'deleteItem' 
-          :exportData="exportFile" 
-          @submit="addOrUpdate"
         >
             <template slot="operation">
                 <li class="r">
                     <span class="label">授权时间</span>
-                    <el-input v-model="userName" placeholder="请输入"></el-input>
+                    <el-date-picker
+                      v-model="time"
+                      type="daterange"
+                      range-separator="至"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期">
+                    </el-date-picker>
                 </li>
                 <li class="r">
-                    <span class="label">有效期</span>
-                    <el-input v-model="userName" placeholder="请输入"></el-input>
+                    <span class="label">是否有效</span>
+                    <el-select v-model="state">
+                        <el-option :value="0" label="全部"></el-option>
+                        <el-option :value="1" label="有效"></el-option>
+                        <el-option :value="2" label="无效"></el-option>
+                    </el-select>
                 </li>
                 <li class="r">
                     <span class="label">授权用户</span>
-                    <el-input v-model="userAddress" placeholder="请输入"></el-input>
+                    <el-input v-model="userName" placeholder="请输入"></el-input>
                 </li>
             </template>
         </Table>
@@ -31,32 +36,36 @@
 </template>
 <script>
 import Table from '@/components/Table.vue'
+import formatDate from '@/utils/formatDate.js'
 export default {
     data(){
         return{
             tableLabel:[
                 {
-                    prop:'FGroupName',
+                    prop:'FUserTypeName',
                     label:'授权用户类型'
                 },
                 {
-                    prop: 'FSimpleName',
+                    prop: 'FUserName',
                     label: '授权用户姓名',
                 },
                 {
-                    prop: 'FAddress',
+                    prop: 'FCreateTime',
                     label: '授权时间',
                 },
                 {
-                    prop: 'FAddress',
-                    label: '授权时间',
+                    prop: 'FExpiresLength',
+                    label: '授权有效期（s）',
                 },
                 {
-                    prop: 'FAddress',
+                    prop: 'FState',
                     label: '状态',
                 }
             
             ],
+            time:[new Date(),new Date()],
+            userName:'',
+            state:0
         }
     },
     components:{
@@ -65,35 +74,18 @@ export default {
     methods:{
         /**
          * 查询数据
-         * @param {Vue Component} that 传入子组件
+         * @param {Object} data 传入子组件
          */
-        queryData(that){
+        queryData(data){
             let param = {
-                PageIndex:that.pageIndex,
-                PageSize:10,
-                SearchKey:that.filterText,
-                FUserName:'',
-                FExpiresLength:'',
-                FCreateTime:''
+                ...data,
+                FUserName:this.userName,
+                SDate:formatDate(this.time[0],'YYYY-MM-DD'),
+                EDate:formatDate(this.time[1],'YYYY-MM-DD'),
+                FSate:this.state
             }
             return this.$post('/Project/QueryPageTAuthorization',param,true)
-        },
-        beforeAdd(){
-
-        },
-        editItem(row){
-
-        },
-        addOrUpdate(){
-
-        },
-        deleteItem(row){
-
-        },
-        exportFile(){
-
-        },
-
+        }
     }
 }
 </script>

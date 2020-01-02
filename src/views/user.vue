@@ -45,7 +45,7 @@
                         <el-cascader
                         v-model="addData.FAddressDetail"
                         :options="treeData"
-                        :props="{ checkStrictly: true,children:'ChildList',label:'FAddressName',value:'FAddressDetail' }"
+                        :props="{ checkStrictly: true,children:'ChildList',label:'FAddressName',value:'FAddressDetail',disabled:'disable',leaf:'leaf' }"
                         clearable>
                         </el-cascader>
                     </el-form-item>
@@ -81,7 +81,7 @@
                             >
                                 <template v-slot="{node,data}">
                                     <span class="node-row">
-                                        {{node.label}}-<span>{{data.AccessName}}</span>
+                                        {{node.label}}-<span class="device-name">{{data.AccessName}}</span>
                                     </span>
                                 </template>
                             </el-tree>
@@ -171,16 +171,18 @@ export default {
                 ProjectIDs:''
             },
             filterText:'',
-            treeData:[],
+            treeData: [],
             treeProp:{
                 children:'ChildList',
-                label:'FAddressName'
+                label:'FAddressName',
+                disabled:'disabled'
             },
             checkedNode:[],
             rightCheckedList:[],
             checkAll:false,
             isIndeterminate:false,
             activeUser:null,
+            projectId:''
         }
     },
     components:{
@@ -189,22 +191,46 @@ export default {
     created(){
         this.defaultAddData = {...this.addData}
         this.queryUserProject()
-        this.queryAddressNodeTree(1)
     },
     methods:{
         /**
          * 查询数据
-         * @param {Vue Component} that 传入子组件
+         * @param {Object} data 传入参数
          */
-        queryData(that){
+        queryData(data){
             let param = {
-                PageIndex:that.pageIndex,
-                PageSize:10,
+                ...data,
                 SearchKey:this.userName,
                 DetailSearchKey:this.userAddress,
-                FAddressDetail:this.userAddress
+                FAddressDetail:this.userAddress,
             }
             return this.$post('/Users/QueryPageUsers',param,true)
+        },
+        formatterTree(treeData){
+            treeData.forEach((item) =>{
+                item.disabled = Boolean(item.disabled)
+                if(item.ChildList&&item.ChildList.length>0){
+                    this.formatterTree(item.ChildList)
+                }else{
+                    item.ChildList = null
+                }
+            })
+            return treeData
+        },
+        /**
+         * 113.查询户址树形数据
+         */
+        queryAddressNodeTree(id){
+            return new Promise((resolve,reject) => {
+                this.$post('/AddressNode/QueryAddressNodeTree',{ProjectID:id})
+                .then((result) => {
+                    let data = result.FObject || []
+                    this.treeData = this.formatterTree(data)
+                    resolve()
+                }).catch((err) => {
+                    reject()
+                });
+            })
         },
         /**
          * 查询用户项目列表
@@ -213,17 +239,6 @@ export default {
             this.$post('/Project/QueryUserProject')
             .then((result) => {
                 this.projectList = result.FObject || []
-            }).catch((err) => {
-                
-            });
-        },
-        /**
-         * 113.查询户址树形数据
-         */
-        queryAddressNodeTree(id){
-            this.$post('/AddressNode/QueryAddressNodeTree',{ProjectID:id})
-            .then((result) => {
-                this.treeData = result.FObject || []
             }).catch((err) => {
                 
             });
@@ -237,9 +252,8 @@ export default {
          * @param {} id 用户id
          */
         queryUserAddressNode(id){
-            this.$post('/Users/QueryUserAddressNode',{FUserGuid:id})
+            this.$post('/Users/QueryUserAddressNode',{FUserGUID:id})
             .then((result) => {
-                console.log(result)
                 let checkedList = result.FObject || []
                 checkedList = checkedList.map(item => item.FGUID)
                 this.$nextTick(() => {
@@ -252,8 +266,9 @@ export default {
         },
         toRight(){
             this.checkedNode = this.$refs.tree.getCheckedNodes()
-            let hafChecked = this.$refs.tree.getHalfCheckedNodes()
-            this.checkedNode.unshift(...hafChecked)	
+            let halfChecked = this.$refs.tree.getHalfCheckedNodes()
+            let checkedList = [...this.checkedNode,...halfChecked]
+            this.checkedNode = checkedList.filter(item => !item.disabled)
         },
         toLeft(){
             this.rightCheckedList.forEach(item => {
@@ -276,18 +291,18 @@ export default {
             Object.keys(this.addData).forEach(key => {
                 this.addData[key] = row[key]
             })
+            this.addData.FAddressDetail = this.addData.FAddressDetail.split('-')
             this.addData.ProjectIDs = row.ProjectId
-            this.queryAddressNodeTree(row.FGUID)
+            this.queryAddressNodeTree(row.ProjectId)
         },
         /**
          * 点击授权
          */
-        updateUser(row){
-            console.log(row)
+        async updateUser(row){
             this.activeUser = row
             this.show = true
+            await this.queryAddressNodeTree(row.ProjectId)
             this.queryUserAddressNode(row.FGUID)
-            /* this.queryAddressNodeTree(row) */
         },
         /**
          * 118.用户授权
@@ -296,7 +311,6 @@ export default {
             let idStr = this.checkedNode.map(item => item.FGUID).join(',')
             this.$post('/Users/UpdateUserAddressNodeAccess',{FGUIDS:idStr,FUserGUID:this.activeUser.FGUID})
             .then((result) => {
-                console.log(result)
                 this.$message({
                     type:'success',
                     message:'操作成功'
@@ -317,10 +331,9 @@ export default {
                   } 
                 });
             })
-            this.addData.FAddressDetail = this.addData.FAddressDetail[0]
+            this.addData.FAddressDetail = this.addData.FAddressDetail&&this.addData.FAddressDetail.join('-')
             this.$post('/Users/AddOrUpdateUser',{TUsers:this.addData})
             .then((result) => {
-                console.log(result)
                 this.$message({
                     type:'success',
                     message:'操作成功'
@@ -436,9 +449,15 @@ export default {
                                 vertical-align: middle;
                                 font-size: 24px
                             }
+                            .device-name{
+                                color: #31BA8B
+                            }
                         }
                         &-node__content:hover {
                             background:#31BA8B;
+                            .device-name{
+                                color: white
+                            }
                         }
                         .el-tree-node__label{
                             font-size: 18px;
@@ -449,9 +468,15 @@ export default {
                     }
                     .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content{
                        background:#31BA8B;
+                        .device-name{
+                            color: white
+                        }
                     }
                     .el-tree.checked {
                         color: #31BA8B;
+                        .device-name{
+                            color: white
+                        }
                     }
                 }
                 .el-checkbox-group.checked-list{

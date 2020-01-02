@@ -26,12 +26,6 @@
                 </el-button>
             </li>
             <template slot="operation">
-                <li class="r" style="position:absolute;top:-90px;right:0px;">
-                    <span class="label">选择项目</span>
-                    <el-select v-model="projectId" @change="selectProject">
-                        <el-option v-for="item in projectList" :key="item.ProjectID" :value="item.ProjectID" :label="item.ProjectName"></el-option>
-                    </el-select>
-                </li>
                 <li class="r">
                     <span class="label">设备类型</span>
                     <el-select v-model="deviceType">
@@ -49,7 +43,7 @@
                     <el-form-item label="设备名称" prop="AccessName" :rules="[{ required: true, message: '请输入'}]">
                         <el-input v-model="addData.AccessName"></el-input>
                     </el-form-item>
-                    <el-form-item label="项目简称"  prop="AccessType" :rules="[{ required: true, message: '请输入'}]">
+                    <el-form-item label="设备类型"  prop="AccessType" :rules="[{ required: true, message: '请输入'}]">
                         <el-select v-model="addData.AccessType">
                             <el-option :value="1" label="入户"></el-option>
                             <el-option :value="2" label="公共"></el-option>
@@ -77,10 +71,12 @@ export default {
                 {
                     prop: 'AccessMAC',
                     label: '设备MAC',
+                    width:260
                 },
                 {
                     prop: 'AccessName',
                     label: '设备名称',
+                    width:260
                 },
                 {
                     prop: 'AccessType',
@@ -102,8 +98,6 @@ export default {
             deviceName:'',
             token:sessionStorage.getItem("FToken"),
             baseUrl:axios.defaults.baseURL,
-            projectId:null,
-            projectList:[],
             addData:{
                 FGUID:'',
                 ProjectID:'',
@@ -114,27 +108,26 @@ export default {
                 AccessVersion:'',
                 AccessPWD:'',
                 FDetail:''
-            }
+            },
+            projectId:''
         }
     },
     components:{
         Table
     },
     created(){
-        this.queryUserProject()
     },
     methods:{
         /**
          * 查询数据
          * @param {Vue Component} that 传入子组件
          */
-        queryData(that){
+        queryData(data){
+            this.projectId = data.ProjectID
             let param = {
-                PageIndex:that.pageIndex,
-                PageSize:10,
+                ...data,
                 SearchKey:this.deviceName,
                 AccessType:this.deviceType,
-                ProjectIDs:this.projectId
             }
             return this.$post('/Access/QueryPageAccessList',param,true)
         },
@@ -159,22 +152,6 @@ export default {
                     message:'导入失败'
                 })
             }
-        },
-        /**
-         * 查询用户项目列表
-         */
-        queryUserProject(){
-            this.$post('/Project/QueryUserProject')
-            .then((result) => {
-                this.projectList = result.FObject || []
-                this.projectId = this.projectList[0]&&this.projectList[0].ProjectID
-                this.$refs.table.queryData()
-            }).catch((err) => {
-                
-            });
-        },
-        selectProject(){
-            this.$refs.table.queryData()
         },
         beforeAdd(){
 

@@ -6,15 +6,17 @@
           :showOperation="false"
           :tableLabel="tableLabel"
           :getData="queryData"
-          @beforeAdd = 'beforeAdd'
-          @editItem = 'editItem'
-          :deleteRow = 'deleteItem' 
-          @submit="addOrUpdate"
         >
             <template slot="operation">
                 <li class="r">
                     <span class="label">出入时间</span>
-                    <el-input v-model="userName" placeholder="请输入"></el-input>
+                     <el-date-picker
+                      v-model="time"
+                      type="daterange"
+                      range-separator="至"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期">
+                    </el-date-picker>
                 </li>
                 <li class="r">
                     <span class="label">门禁名称</span>
@@ -26,7 +28,9 @@
                 </li>
                 <li class="l">
                     <span class="label">用户类型</span>
-                    <el-input v-model="userAddress" placeholder="请输入"></el-input>
+                    <el-select v-model="userType">
+                        <el-option v-for="(item,i) in userTypeList" :key="i" :value="i" :label="item"></el-option>
+                    </el-select>
                 </li>
             </template>
         </Table>
@@ -34,69 +38,65 @@
 </template>
 <script>
 import Table from '@/components/Table.vue'
+import formatDate from '@/utils/formatDate.js'
 export default {
     data(){
         return{
             tableLabel:[
                 {
-                    prop:'ProjectName',
-                    label:'项目名称'
-                },
-                {
-                    prop: 'FSimpleName',
+                    prop: 'UserTypeName',
                     label: '用户类型',
                 },
                 {
-                    prop: 'FAddress',
+                    prop: 'UserName',
                     label: '用户姓名',
                 },
                 {
-                    prop: 'FAddress',
+                    prop: 'AccessType',
                     label: '门禁类型',
+                    formatter:row => row.AccessType == 1?'入户':'公共'
                 },
                 {
-                    prop: 'FAddress',
+                    prop: 'FCreateTime',
                     label: '出入时间',
+                    width:260
                 },
                 {
-                    prop: 'FAddress',
+                    prop: 'FResult',
                     label: '结果',
                 },
                 {
-                    prop: 'FAddress',
+                    prop: 'TokenName',
                     label: '授权人',
                 }
             ],
-            userName:''
+            userTypeList:['全部','物业','业主','访客'],
+            userName:'',
+            accessName:'',
+            userType:0,
+            time:[new Date(),new Date()],
         }
     },
     components:{
         Table
     },
+    created(){
+    },
     methods:{
         /**
          * 查询数据
-         * @param {Vue Component} that 传入子组件
+         * @param {Object} data 传入参数
          */
-        queryData(that){
+        queryData(data){
             let param = {
-                PageIndex:that.pageIndex,
-                PageSize:10,
-                SearchKey:that.filterText
+                ...data,
+                FType:this.userType,
+                FUserName:this.userName,
+                AccessName:this.accessName,
+                SDate:formatDate(this.time[0],'YYYY-MM-DD'),
+                EDate:formatDate(this.time[1],'YYYY-MM-DD'),
             }
-            return this.$post('/Project/QueryPageTAuthorization',param,true)
-        },
-        beforeAdd(){
-
-        },
-        editItem(row){
-
-        },
-        addOrUpdate(){
-
-        },
-        deleteItem(row){
-
+            return this.$post('/Users/QueryPageTEntryExitRecords',param,true)
         },
     }
 }

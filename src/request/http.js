@@ -5,7 +5,7 @@ import { Loading } from 'element-ui';
 if (process.env.NODE_ENV == 'development') {    
     /* axios.defaults.baseURL = 'http://www.caszyj.com/DigitalAPI/'; */
     /* axios.defaults.baseURL = 'http://172.172.172.80:8088/' */
-    axios.defaults.baseURL = 'http://172.172.172.80:9090'
+    axios.defaults.baseURL = 'https://mj.szqianren.com:9090/';
     
 } 
 else if (process.env.NODE_ENV == 'debug') {    
