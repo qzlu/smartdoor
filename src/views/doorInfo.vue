@@ -18,7 +18,7 @@
                     :show-file-list = 'false'
                     :action="`${baseUrl}/UploadFile`"
                     :on-success="handleSuccess"
-                    :data="{FAction:'UpLoadFile',FTokenID:token,FType:'addaccess',ProjectID:1}"
+                    :data="{FAction:'UpLoadFile',FTokenID:token,FType:'addaccess',ProjectID:projectId}"
                 >
                     <i class="iconfont icon-Godown"></i>
                     导入

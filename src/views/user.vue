@@ -29,16 +29,19 @@
                             <el-option v-for="item in projectList" :key="item.ProjectID" :value="item.ProjectID" :label="item.ShortName"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="用户姓名"  prop="FUserName" :rules="[{ required: true, message: '请输入'}]">
+                    <el-form-item label="账号"  prop="FUserName" :rules="[{ required: true, message: '请输入'}]">
                         <el-input  v-model="addData.FUserName"></el-input>
+                    </el-form-item>
+                    <el-form-item label="用户姓名"  prop="FContacts" :rules="[{ required: true, message: '请输入'}]">
+                        <el-input  v-model="addData.FContacts"></el-input>
                     </el-form-item>
                     <el-form-item label="手机号码" prop="FTelephone" :rules="FTelephoneRule">
                         <el-input v-model="addData.FTelephone"></el-input>
                     </el-form-item>
                     <el-form-item label="用户类型"  prop="FUserType" :rules="[{ required: true, message: '请输入'}]">
                         <el-select v-model="addData.FUserType">
-                            <el-option :value="0" label="物业"></el-option>
-                            <el-option :value="1" label="业主"></el-option>
+                            <el-option :value="1" label="物业"></el-option>
+                            <el-option :value="2" label="业主"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="户址" prop="FAddressDetail">
@@ -132,7 +135,7 @@ export default {
                     width:200
                 },
                 {
-                    prop: 'FUserName',
+                    prop: 'FContacts',
                     label: '用户姓名',
                     width:120
                 },
@@ -144,7 +147,7 @@ export default {
                 {
                     prop: 'FUserType',
                     label: '用户类型',
-                    formatter:row => row.FUserType == 1?'业主':'物业',
+                    formatter:row => row.FUserType == 1?'物业':'业主',
                     width:120
                 },
                 {

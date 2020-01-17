@@ -70,10 +70,9 @@ export default {
          * 查询数据
          * @param {Vue Component} that 传入子组件
          */
-        queryData(that){
+        queryData(data){
             let param = {
-                PageIndex:that.pageIndex,
-                PageSize:10,
+                ...data,
                 SearchKey:this.filterText
             }
             return this.$post('/Project/QueryPageTProject',param,true)

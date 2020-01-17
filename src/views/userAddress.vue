@@ -17,7 +17,7 @@
                     >
                         <template v-slot="{node,data}">
                             <span class="node-row">
-                                <i v-if="data.FAccessGUID" class="iconfont icon-EntranceGuard"></i>{{node.label}}
+                                <i v-if="data.FAccessGUID&&data.FAccessGUID !='00000000-0000-0000-0000-000000000000'" class="iconfont icon-EntranceGuard"></i>{{node.label}}
                             </span>
                         </template>
                     </el-tree>
