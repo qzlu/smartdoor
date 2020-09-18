@@ -52,10 +52,19 @@ export default {
                 {
                     prop: 'FCreateTime',
                     label: '授权时间',
+                    width:240
                 },
                 {
                     prop: 'FExpiresLength',
                     label: '授权有效期（s）',
+                },
+                {
+                    prop: 'VisitorName',
+                    label: '访客姓名',
+                },
+                {
+                    prop: 'VisitorTelephone',
+                    label: '联系电话',
                 },
                 {
                     prop: 'FState',

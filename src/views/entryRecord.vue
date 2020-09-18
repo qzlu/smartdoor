@@ -50,6 +50,15 @@ export default {
                 {
                     prop: 'UserName',
                     label: '用户姓名',
+                    width:180
+                },
+                {
+                    prop: 'VisitorTelephone',
+                    label: '手机号码',
+                },
+                {
+                    prop: 'TokenName',
+                    label: '分享业主',
                 },
                 {
                     prop: 'AccessType',
