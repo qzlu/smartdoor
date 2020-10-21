@@ -70,14 +70,14 @@ export default {
                     label: '出入时间',
                     width:260
                 },
-                {
+                /* {
                     prop: 'FResult',
                     label: '结果',
                 },
                 {
                     prop: 'TokenName',
                     label: '授权人',
-                }
+                } */
             ],
             userTypeList:['全部','物业','业主','访客'],
             userName:'',

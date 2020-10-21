@@ -57,6 +57,7 @@ export default {
                 {
                     prop: 'FExpiresLength',
                     label: '授权有效期（s）',
+                    width:190
                 },
                 {
                     prop: 'VisitorName',
@@ -65,6 +66,10 @@ export default {
                 {
                     prop: 'VisitorTelephone',
                     label: '联系电话',
+                },
+                {
+                    prop: 'FDetail',
+                    label: '来访事由',
                 },
                 {
                     prop: 'FState',

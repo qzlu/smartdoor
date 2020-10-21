@@ -48,7 +48,7 @@
                         <el-cascader
                         v-model="addData.FAddressDetail"
                         :options="treeData"
-                        :props="{ checkStrictly: true,children:'ChildList',label:'FAddressName',value:'FAddressDetail',disabled:'disable',leaf:'leaf' }"
+                        :props="{ checkStrictly: true,children:'ChildList',label:'FAddressName',value:'FAddressName',disabled:'disable',leaf:'leaf' }"
                         clearable>
                         </el-cascader>
                     </el-form-item>
@@ -334,6 +334,7 @@ export default {
                   } 
                 });
             })
+            console.log(this.addData.FAddressDetail)
             this.addData.FAddressDetail = this.addData.FAddressDetail&&this.addData.FAddressDetail.join('-')
             this.$post('/Users/AddOrUpdateUser',{TUsers:this.addData})
             .then((result) => {
