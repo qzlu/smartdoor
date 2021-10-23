@@ -4,7 +4,7 @@
             <img src="@/assets/images/login.gif" alt="">
         </div>
         <div class="login-box height-100">
-            <h1>智门禁</h1>
+            <h1>智慧门禁系统</h1>
             <el-form ref="login" :model="userInfo">
                 <el-form-item prop="FUserName" :rules="[{ required: true, message: '请输入用户名'}]">
                     <el-input v-model="userInfo.FUserName" placeholder="请输入用户名/手机号码" @focus="errText = null"></el-input>
